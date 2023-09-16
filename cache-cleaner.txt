@@ -1,0 +1,55 @@
+-- Definiere den Ordnerpfad und den Dateityp
+set folderPath to POSIX file "/Users/timkastner/Movies"
+set fileType to "fcpcache"
+
+-- Überprüfe, ob Cache-Dateien existieren
+tell application "Finder"
+	set cacheFiles to (every file of folder folderPath whose name extension is fileType)
+	set cacheCount to count of cacheFiles
+	set totalSize to 0
+	repeat with aFile in cacheFiles
+		set totalSize to totalSize + (size of aFile)
+	end repeat
+end tell
+
+-- Richtige Einheit der Dateigröße wählen
+set besteEinheit to "B"
+if totalSize > 1024 then set besteEinheit to "KB"
+if totalSize > 1024 * 1024 then set besteEinheit to "MB"
+if totalSize > 1024 * 1024 * 1024 then set besteEinheit to "GB"
+if totalSize > 1024 * 1024 * 1024 * 1024 then set besteEinheit to "TB"
+
+-- Richtige Einheit berechnen
+if besteEinheit = "KB" then set totalSize to totalSize / (1024)
+if besteEinheit = "MB" then set totalSize to totalSize / (1024 * 1024)
+if besteEinheit = "GB" then set totalSize to totalSize / (1024 * 1024 * 1024)
+if besteEinheit = "TB" then set totalSize to totalSize / (1024 * 1024 * 1024 * 1024)
+
+-- berechnete Einheit runden
+set roundedTotalSize to (round (totalSize * 100)) / 100
+
+-- Handeln basierend auf Cache-Dateien
+if cacheCount > 0 then
+	set pluralSingularText to "Cache-Datei"
+	if cacheCount > 1 then set pluralSingularText to "Cache-Dateien"
+	
+	set dialogText to "Es existieren " & (cacheCount as text) & " " & pluralSingularText & " mit einer Gesamtgröße von " & (roundedTotalSize as text) & " " & besteEinheit & ". Möchtest du sie löschen?"
+	set dialogResult to display dialog dialogText buttons {"Abbrechen", "Ja"} default button "Ja" cancel button "Abbrechen"
+	
+	if button returned of dialogResult is "Ja" then
+		-- Lösche Cache-Dateien
+		tell application "Finder"
+			delete cacheFiles
+		end tell
+		
+		-- Leere den Papierkorb
+		set emptyTrashResult to display dialog "Möchtest du den Papierkorb leeren?" buttons {"Nein", "Ja"} default button "Ja" cancel button "Nein"
+		if button returned of emptyTrashResult is "Ja" then
+			tell application "Finder"
+				empty trash
+			end tell
+		end if
+	end if
+else
+	display alert "Keine Cache-Dateien gefunden"
+end if
