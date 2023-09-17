@@ -1,8 +1,13 @@
--- Definiere den Ordnerpfad und den Dateityp
-set folderPath to POSIX file "/Users/timkastner/Movies"
+-- get Username of current User
+set userName to do shell script "whoami"
+
+-- create Filepath with Username
+set folderPath to "Macintosh HD:Users:" & userName & ":Movies"
+
+-- define Filetype
 set fileType to "fcpcache"
 
--- Überprüfe, ob Cache-Dateien existieren
+-- check if Cache-Files Exist
 tell application "Finder"
 	set cacheFiles to (every file of folder folderPath whose name extension is fileType)
 	set cacheCount to count of cacheFiles
@@ -12,44 +17,45 @@ tell application "Finder"
 	end repeat
 end tell
 
--- Richtige Einheit der Dateigröße wählen
-set besteEinheit to "B"
-if totalSize > 1024 then set besteEinheit to "KB"
-if totalSize > 1024 * 1024 then set besteEinheit to "MB"
-if totalSize > 1024 * 1024 * 1024 then set besteEinheit to "GB"
-if totalSize > 1024 * 1024 * 1024 * 1024 then set besteEinheit to "TB"
+-- choose correct Unit to Display Filesize
+set bestUnit to "B"
+if totalSize > 1024 then set bestUnit to "KB"
+if totalSize > 1024 * 1024 then set bestUnit to "MB"
+if totalSize > 1024 * 1024 * 1024 then set bestUnit to "GB"
+if totalSize > 1024 * 1024 * 1024 * 1024 then set bestUnit to "TB"
 
--- Richtige Einheit berechnen
-if besteEinheit = "KB" then set totalSize to totalSize / (1024)
-if besteEinheit = "MB" then set totalSize to totalSize / (1024 * 1024)
-if besteEinheit = "GB" then set totalSize to totalSize / (1024 * 1024 * 1024)
-if besteEinheit = "TB" then set totalSize to totalSize / (1024 * 1024 * 1024 * 1024)
+-- calculate correct units
+if bestUnit = "KB" then set totalSize to totalSize / (1024)
+if bestUnit = "MB" then set totalSize to totalSize / (1024 * 1024)
+if bestUnit = "GB" then set totalSize to totalSize / (1024 * 1024 * 1024)
+if bestUnit = "TB" then set totalSize to totalSize / (1024 * 1024 * 1024 * 1024)
 
--- berechnete Einheit runden
+-- round calculated unit
 set roundedTotalSize to (round (totalSize * 100)) / 100
 
--- Handeln basierend auf Cache-Dateien
+-- act based on Cache-Files
 if cacheCount > 0 then
-	set pluralSingularText to "Cache-Datei"
-	if cacheCount > 1 then set pluralSingularText to "Cache-Dateien"
+	set pluralSingularText to "Cache-File"
+	if cacheCount > 1 then set pluralSingularText to "Cache-Files"
 	
-	set dialogText to "Es existieren " & (cacheCount as text) & " " & pluralSingularText & " mit einer Gesamtgröße von " & (roundedTotalSize as text) & " " & besteEinheit & ". Möchtest du sie löschen?"
-	set dialogResult to display dialog dialogText buttons {"Abbrechen", "Ja"} default button "Ja" cancel button "Abbrechen"
+	set dialogText to "There exist/s " & (cacheCount as text) & " " & pluralSingularText & " with a total Size of " & (roundedTotalSize as text) & " " & bestUnit & ".
+Do you want to move it to Trash?"
+	set dialogResult to display alert dialogText buttons {"Cancel", "Yes"} default button "Yes" cancel button "Cancel"
 	
-	if button returned of dialogResult is "Ja" then
-		-- Lösche Cache-Dateien
+	if button returned of dialogResult is "Yes" then
+		-- Delete Cache-Files
 		tell application "Finder"
 			delete cacheFiles
 		end tell
 		
-		-- Leere den Papierkorb
-		set emptyTrashResult to display dialog "Möchtest du den Papierkorb leeren?" buttons {"Nein", "Ja"} default button "Ja" cancel button "Nein"
-		if button returned of emptyTrashResult is "Ja" then
+		-- Empty Trash
+		set emptyTrashResult to display alert "Do you want to empty Trash?" buttons {"No", "Yes"} default button "Yes" cancel button "No"
+		if button returned of emptyTrashResult is "Yes" then
 			tell application "Finder"
 				empty trash
 			end tell
 		end if
 	end if
 else
-	display alert "Keine Cache-Dateien gefunden"
+	display alert "No Cache-Files found"
 end if
