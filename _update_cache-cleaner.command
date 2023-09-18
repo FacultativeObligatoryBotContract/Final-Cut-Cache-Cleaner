@@ -1,2 +1,2 @@
-cd /Users/timkastner/Documents/Final-Cut-Cache-Cleaner
+cd /Applications/Final-Cut-Cache-Cleaner
 git pull
