@@ -30,5 +30,9 @@ To speed up the process, you can just always hit "Enter" every time a Dialog app
 </p>
 
 <p>
+  of course you can always cancel the Dialog. Klicking "Cancel" will also quit the Application
+</p>
+
+<p>
 I hope my little Application helps you keeping space on your Disks :)
 </p>
