@@ -10,7 +10,7 @@ I recommend dropping it into the Dock so you can just click on it instead of sea
 </p>
 
 ### IMPORTANT: The app will assume that the Cache-Files of your Final Cut Pro Libraries are saved into your "Movies" Folder!
-So make sure the settings of your library are set accordingly. Of course you can change the Path into the ".scpt"-File to whatever you want.
+So make sure the settings of your library are set accordingly. Of course you can change the Path inside the ".scpt"-File to whatever you want.
 <p>
 maybe I'll publish an update that solves this problem later :)
 </p>
